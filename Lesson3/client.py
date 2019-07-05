@@ -106,9 +106,10 @@ def main():
     s.send(auth_msg.encode('utf-8'))
     data = s.recv(640)
     response_code = data['response']
+
     if response_code == 200:
         print(f'{data["alert"]}')
-    elif response_code = 409:
+    elif: response_code = 409
         print(f'')
     print('Сообщение от сервера: ', data.decode('utf-8'), ', длиной ', len(data), ' байт')
 
