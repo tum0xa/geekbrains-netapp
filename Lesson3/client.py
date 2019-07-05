@@ -18,9 +18,15 @@ from socket import *
 import sys
 import re
 import json
+import time
 
-DEFAULT_PORT = '7777'
-DEFAULT_SERVER_IP = 'localhost'
+DEFAULT_PORT = 7777
+DEFAULT_SERVER = 'localhost'
+
+DEFAULT_USER = 'guest'
+DEFAULT_PASS = 'quest'
+DEFAULT_USER_STATUS = "I'm guest!"
+
 MAX_CLIENTS = 5
 PORT_PATTERN = r'^[0-9]{,5}$'
 IP_PATTERN = r'^((25[0-5])|(2[0-4][0-9])|(1[0-9][0-9])|([1-9][0-9])|([0-9]))[.]((25[0-5])|(2[0-4][0-9])|(1[0-9][0-9])' \
@@ -37,61 +43,77 @@ test_msg = """{
                     }
     }"""
 
+
 def main():
     arg_dict = {}
     port = DEFAULT_PORT
-    server_ip = DEFAULT_SERVER_IP
-    param = ''
+    server = DEFAULT_SERVER
+    user_name = DEFAULT_USER
+    user_pass = DEFAULT_PASS
+    user_status = 'Hello!'
 
-    for n in range(1, len(sys.argv)):
-        arg = sys.argv[n]
-        if arg == '-p':
-            try:
-                param = sys.argv[n + 1]
-            except IndexError:
-                param = DEFAULT_PORT
-            else:
-                if param.startswith('-'):
-                    param = DEFAULT_PORT
-            finally:
-                if re.match(PORT_PATTERN, param):
-                    if 0 < int(param) < 65536:
-                        port = param
-                    else:
-                        port = DEFAULT_PORT
+    if len(sys.argv) > 2:
+        print("Too many parameters!")
+        quit()
+    else:
+
+        try:
+            server = sys.argv[1]
+        except IndexError:
+            print('IP address or name of server required!')
+            quit()
+        finally:
+            arg_dict['server_ip'] = server
+
+        try:
+            port = sys.argv[2]
+        except IndexError:
+            port = DEFAULT_PORT
+        finally:
+            if re.match(PORT_PATTERN, str(port)):
+                if 0 < int(port) < 65536:
+                    port = int(port)
                 else:
                     port = DEFAULT_PORT
-
-                arg_dict['port'] = port
-
-        elif arg == '-a':
-            try:
-                param = sys.argv[n + 1]
-
-            except IndexError:
-                param = DEFAULT_SERVER_IP
             else:
-                if param.startswith('-'):
-                    param = DEFAULT_SERVER_IP
-            finally:
+                port = DEFAULT_PORT
+            port = int(port)
+            arg_dict['port'] = port
 
-                if re.match(IP_PATTERN, param):
-                    ip_listen = param
-                else:
-                    ip_listen = DEFAULT_SERVER_IP
-
-                arg_dict['server_ip'] = server_ip
-
-        elif arg not in arg_dict.keys() and arg not in arg_dict.values():
-            if arg.startswith('-'):
-                print(f'Wrong argument "{arg}"!')
-            else:
-                print(f'Parameter "{arg}" is wrong!')
     msg = test_msg
+
+    auth_msg = json.dumps({
+        "action": "authenticate",
+        "time": str(time.time()),
+        "user": {
+            "account_name": user_name,
+            "password": user_pass
+        }
+    })
+
+    presense_msg = str({"action": "presence",
+                        "time": str(time.time()),
+                        "type": "status",
+                        "user": {
+                            "account_name": user_name,
+                            "status": user_status
+                        }
+                        })
+
     s = socket(AF_INET, SOCK_STREAM)
-    s.connect((server_ip, int(port)))
-    s.send(msg.encode('utf-8'))
-    # data = s.recv(640)
+    s.connect((server, port))
+
+    s.send(auth_msg.encode('utf-8'))
+    data = s.recv(640)
+    response_code = data['response']
+    if response_code == 200:
+        print(f'{data["alert"]}')
+    elif response_code = 409:
+        print(f'')
+    print('Сообщение от сервера: ', data.decode('utf-8'), ', длиной ', len(data), ' байт')
+
+    # s.send(presense_msg.encode('utf-8'))
+
     # # print('Сообщение от сервера: ', data.decode('utf-8'), ', длиной ', len(data), ' байт')
     s.close()
 

@@ -32,7 +32,7 @@ def main():
     port = DEFAULT_PORT
     ip_listen = DEFAULT_IP
     param = ''
-
+    contact_list = []
     for n in range(1, len(sys.argv)):
         arg = sys.argv[n]
         if arg == '-p':
@@ -87,9 +87,30 @@ def main():
         print(port, ip_listen)
         client, addr = s.accept()
         data = client.recv(640)
-        print(json.loads(data.decode()))
+        msg = json.loads(data.decode())
 
-        client.send("Hello!".encode('ascii'))
+        if msg['action'] == 'authenticate':
+            user = msg['user']
+            user_name = user['account_name']
+            if user_name in contact_list:
+                response = json.dumps({
+                    'response': 409,
+                    'error': f"Someone is already connected with the given user name {user_name}"
+                })
+            else:
+                contact_list.append(user_name)
+                response = json.dumps({
+                    'response': 200,
+                    'alert': f"Hello, {user_name}"
+                })
+        else:
+            response = json.dumps({
+                'response': 200,
+                'alert': f"Hello!"
+            })
+
+        client.send(response.encode())
+        print(contact_list)
         client.close()
 
 
