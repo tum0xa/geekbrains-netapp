@@ -2,38 +2,13 @@ import re
 import unittest
 
 
-PATTERN_EMAIL = r'^([a-z0-9_\.-]+\@[\da-z\.-]+\.[a-z\.]{2,6})$'
 
 
-def check_email(email):
-    if re.match(PATTERN_EMAIL, email):
-        return email
-    else:
-        return None
 
 
-class User:
-
-    _is_active = False
-
-    def __init__(self, username, password, email):
-        self.username = username
-        self._password = password
-        self.email = check_email(email)
-
-    @property
-    def is_active(self):
-        return self._is_active
-
-    def activate(self):
-        self._is_active = True
 
 
-class Client(User):
 
-    addresses = ['localhost']
-    is_online = False
-    room = None
 
 
 class Room:
