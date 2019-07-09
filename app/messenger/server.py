@@ -1,10 +1,15 @@
 import json
+import logging
 import os
 import sys
 from socket import socket, AF_INET, SOCK_STREAM
 
 from tools.checkers import *
 from client import Client
+from log.decorators import Log
+
+logger = logging.getLogger('server')
+log = Log(logger)
 
 DEFAULT_PORT = '8888'
 MAX_CLIENTS = 5
@@ -21,6 +26,7 @@ class Server:
         self.port = port
         self.host = host
 
+    @log
     def start(self):
         try:
             self.socket = socket(AF_INET, SOCK_STREAM)
@@ -37,6 +43,7 @@ class Server:
         self.guests.append(client)
         return client
 
+    @log
     def get_message_from_client(self, client):
         data = client.client.recv(MAX_SIZE)
         message = json.loads(data.decode())

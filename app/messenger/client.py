@@ -1,7 +1,13 @@
 import sys
 import json
+import logging
 from socket import socket, AF_INET, SOCK_STREAM
 from tools.checkers import *
+
+from log.decorators import Log
+
+logger = logging.getLogger('client')
+log = Log(logger)
 
 DEFAULT_PORT = '8888'
 MAX_SIZE = 640
@@ -49,6 +55,7 @@ class Client:
         if address not in self.addresses:
             self.addresses.append(address)
 
+    @log
     def connect_to_server(self, address, port=DEFAULT_PORT):
         try:
             self.client = socket(AF_INET, SOCK_STREAM)
@@ -61,5 +68,5 @@ class Client:
     def send_hello(self):
         self.client.send(test_msg.encode('utf-8'))
 
-    def authenticate(self):
+    # def authenticate(self):
 

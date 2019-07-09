@@ -1,5 +1,7 @@
 from functools import wraps
-
+import traceback
+import inspect
+import datetime
 
 class Log:
 
@@ -22,10 +24,15 @@ class Log:
     def __call__(self, func):
 
         @wraps(func)
-        def decorated(*args, **kwargs):
-            result = func(*args, **kwargs)
+        def decorated(result, *args, **kwargs):
+            result = func(result, *args, **kwargs)
             message = Log._create_message(result, *args, **kwargs)
-            self.logger.info(f'{message} - {decorated.__name__} - {decorated.__module__}')
+            self.logger.info(f'{message} - {decorated.__name__} - {decorated.__module__}\n'
+                             f'{datetime.datetime.now()} Function (method) "{decorated.__name__}" '
+                             f'was called by function (method) "{inspect.stack()[1][3]}"')
             return result
 
         return decorated
+
+
+
