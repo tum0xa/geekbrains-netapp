@@ -60,3 +60,6 @@ class Client:
 
     def send_hello(self):
         self.client.send(test_msg.encode('utf-8'))
+
+    def authenticate(self):
+

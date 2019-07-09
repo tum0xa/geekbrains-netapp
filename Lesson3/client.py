@@ -28,10 +28,13 @@ DEFAULT_PASS = 'quest'
 DEFAULT_USER_STATUS = "I'm guest!"
 
 MAX_CLIENTS = 5
+
 PORT_PATTERN = r'^[0-9]{,5}$'
+
 IP_PATTERN = r'^((25[0-5])|(2[0-4][0-9])|(1[0-9][0-9])|([1-9][0-9])|([0-9]))[.]((25[0-5])|(2[0-4][0-9])|(1[0-9][0-9])' \
              r'|([1-9][0-9])|([0-9]))[.]((25[0-5])|(2[0-4][0-9])|(1[0-9][0-9])|([1-9][0-9])|([0-9]))[.]((25[0-5])|(2' \
              r'[0-4][0-9])|(1[0-9][0-9])|([1-9][0-9])|([0-9]))$'
+
 
 test_msg = """{
            "action": "presence",
@@ -111,6 +114,7 @@ def main():
         print(f'{data["alert"]}')
     elif: response_code = 409
         print(f'')
+
     print('Сообщение от сервера: ', data.decode('utf-8'), ', длиной ', len(data), ' байт')
 
     # s.send(presense_msg.encode('utf-8'))
